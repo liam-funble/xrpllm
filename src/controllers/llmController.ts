@@ -10,7 +10,7 @@ export class LLMController {
 
   async generateResponse(req: Request, res: Response) {
     try {
-      const { prompt, model } = req.body;
+      const { prompt, userId, model } = req.body;
       console.log('LLMController.generateResponse - Request body:', req.body);
 
       if (!prompt) {
@@ -22,7 +22,7 @@ export class LLMController {
       }
 
       console.log('LLMController.generateResponse - Calling LLM service');
-      const result = await this.llmService.generateResponse(prompt, model);
+      const result = await this.llmService.generateResponse(prompt, userId, model);
       console.log('LLMController.generateResponse - LLM service response:', result);
 
       res.json(result);
@@ -32,38 +32,6 @@ export class LLMController {
         error
       });
 
-      res.status(500).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
-    }
-  }
-
-  async streamResponse(req: Request, res: Response) {
-    try {
-      const { prompt, model } = req.body;
-
-      if (!prompt) {
-        return res.status(400).json({
-          success: false,
-          message: 'Prompt is required'
-        });
-      }
-
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-
-      await this.llmService.streamResponse(
-        prompt,
-        model,
-        (token) => {
-          res.write(`data: ${JSON.stringify({ token })}\n\n`);
-        }
-      );
-
-      res.end();
-    } catch (error) {
       res.status(500).json({
         success: false,
         message: error instanceof Error ? error.message : 'Unknown error occurred'
