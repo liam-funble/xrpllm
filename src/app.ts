@@ -1,6 +1,6 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
-import { specs } from './config/swagger.config'
+import { specs, exportSwaggerDocs } from './config/swagger.config'
 import accountRoutes from './routes/accountRoutes'
 import transactionRoutes from './routes/transactionRoutes'
 import llmRoutes from './routes/llmRoutes'
@@ -10,6 +10,12 @@ app.use(express.json())
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
+
+// Export swagger documentation
+if (process.env.NODE_ENV === 'development') {
+  exportSwaggerDocs()
+  console.log('Swagger documentation exported to swagger.json')
+}
 
 // Routes
 app.use('/api/accounts', accountRoutes)
