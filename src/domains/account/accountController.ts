@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { AccountService } from '../services/accountService'
-import { getClient } from '../config/xrpl.config'
+import { AccountService } from './accountService'
+import { getClient } from '../../config/xrpl.config'
 
 export class AccountController {
   private accountService!: AccountService

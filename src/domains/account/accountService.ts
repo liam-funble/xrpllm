@@ -1,6 +1,6 @@
 import { Client, Wallet } from 'xrpl'
-import { Account, AccountCreateResponse, AccountInfoResponse } from '../models/Account'
-import { getClient } from '../config/xrpl.config'
+import { Account, AccountCreateResponse, AccountInfoResponse } from './Account'
+import { getClient } from '../../config/xrpl.config'
 
 export class AccountService {
   private client: Client
@@ -56,4 +56,4 @@ export class AccountService {
       }
     }
   }
-} 
+}

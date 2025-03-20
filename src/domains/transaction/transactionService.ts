@@ -1,5 +1,5 @@
 import { Client, Wallet, xrpToDrops, Payment, TransactionMetadata } from 'xrpl'
-import { Transaction, TransactionRequest, TransactionResponse, TransactionHistoryResponse } from '../models/Transaction'
+import { Transaction, TransactionRequest, TransactionResponse, TransactionHistoryResponse } from './Transaction'
 
 export class TransactionService {
   private client: Client
@@ -131,4 +131,4 @@ export class TransactionService {
       }
     }
   }
-} 
+}

@@ -17,7 +17,7 @@ const options = {
       },
     ],
   },
-  apis: ['./src/routes/*.ts'], // routes 폴더의 모든 ts 파일을 스캔
+  apis: ['./src/domains/**/*Routes.ts'], //  *.routes.js 파일을 찾도록 설정
 }
 
 export const specs = swaggerJsdoc(options)

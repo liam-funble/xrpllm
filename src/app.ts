@@ -1,9 +1,10 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import { specs, exportSwaggerDocs } from './config/swagger.config'
-import accountRoutes from './routes/accountRoutes'
-import transactionRoutes from './routes/transactionRoutes'
-import llmRoutes from './routes/llmRoutes'
+import accountRoutes from './domains/account/accountRoutes'
+import transactionRoutes from './domains/transaction/transactionRoutes'
+import llmRoutes from './domains/llm/llmRoutes'
+import nftRoutes from './domains/nft/nftRoutes'
 
 const app = express()
 app.use(express.json())
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/accounts', accountRoutes)
 app.use('/api/transactions', transactionRoutes)
 app.use('/api/llm', llmRoutes)
+app.use('/api/nft', nftRoutes)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {

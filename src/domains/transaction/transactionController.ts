@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { TransactionService } from '../services/transactionService'
-import { getClient } from '../config/xrpl.config'
+import { TransactionService } from './transactionService'
+import { getClient } from '../../config/xrpl.config'
 
 export class TransactionController {
   private transactionService!: TransactionService

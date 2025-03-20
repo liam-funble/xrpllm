@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { LLMService } from '../services/llmService';
+import { LLMService } from './llmService';
 
 export class LLMController {
   private llmService: LLMService;

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import PromptTemplate from './prompt-template'; // 새 파일 임포트
+import {PromptTemplate} from './prompt/prompt-template'; // 새 파일 임포트
 
 dotenv.config();
 
@@ -58,10 +58,29 @@ export class LLMService {
   private parseJsonFromLLMResponse(response: string): any {
     try {
       const jsonString = response.replace(/```json\n?/, '').replace(/\n?```/, '');
-      return JSON.parse(jsonString);
+      const parsed = JSON.parse(jsonString);
+  
+      // 응답 형식 검증
+      if (!parsed.statusInfo || !parsed.data) {
+        throw new Error('Invalid response format');
+      }
+      if (!['success', 'partial', 'fail'].includes(parsed.statusInfo.status)) {
+        throw new Error('Invalid status value');
+      }
+      // if (parsed.data.task && !TASKS.some(t => t.name === parsed.data.task)) {
+      //   throw new Error('Invalid task name');
+      // }
+  
+      return parsed;
     } catch (error) {
       console.error('Error parsing JSON from LLM response:', error);
-      return null;
+      return {
+        statusInfo: {
+          status: 'fail',
+          description: 'LLM 응답 형식이 잘못됨'
+        },
+        data: null
+      };
     }
   }
 
