@@ -36,10 +36,21 @@ const llmController = new LLMController();
  *             type: object
  *             required:
  *               - prompt
+ *               - userId
+ *               - accounts
  *             properties:
  *               prompt:
  *                 type: string
  *                 description: LLM에 전달할 프롬프트
+ *                 example: "밥에게 1000ETH 보내줘"
+ *               userId:
+ *                 type: string
+ *                 description: 요청을 보내는 사용자의 ID
+ *                 example: "asdf1234"
+ *               accounts:
+ *                 type: string
+ *                 description: 사용자 계정 주소 목록 (콤마로 구분)
+ *                 example: "Me: rwZ4GZR18mKchv41e7DUBobH4iGRUvxK3t, Bob: rKG6Er5J9jXAMyKpDpFryeqtTZUct1T2tp, Alice: rX1y2z3w4v5u"
  *               model:
  *                 type: string
  *                 default: gemma3:27b
@@ -63,7 +74,7 @@ const llmController = new LLMController();
  *                   example: false
  *                 message:
  *                   type: string
- *                   example: Prompt is required
+ *                   example: Prompt, userId, or accounts is required
  *       500:
  *         description: 서버 에러
  *         content:
@@ -80,4 +91,4 @@ const llmController = new LLMController();
 
 router.post('/generate', llmController.generateResponse.bind(llmController));
 
-export default router; 
+export default router;

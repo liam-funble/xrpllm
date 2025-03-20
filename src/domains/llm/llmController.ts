@@ -10,7 +10,7 @@ export class LLMController {
 
   async generateResponse(req: Request, res: Response) {
     try {
-      const { prompt, userId, model } = req.body;
+      const { prompt, userId,accounts, model } = req.body;
       console.log('LLMController.generateResponse - Request body:', req.body);
 
       if (!prompt) {
@@ -22,7 +22,7 @@ export class LLMController {
       }
 
       console.log('LLMController.generateResponse - Calling LLM service');
-      const result = await this.llmService.generateResponse(prompt, userId, model);
+      const result = await this.llmService.generateResponse(prompt, userId, accounts, model);
       console.log('LLMController.generateResponse - LLM service response:', result);
 
       res.json(result);

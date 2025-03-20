@@ -2,12 +2,6 @@ import {TaskDefinition} from "./task-definition";
 
 export const TASKS: TaskDefinition[] = [
     {
-        name: "create-account",
-        endpoint: "POST: /api/accounts/create",
-        parameters: null,
-        description: "새로운 XRPL 계정을 생성합니다. 추가 파라미터 필요 없음.",
-    },
-    {
         name: "get-account",
         endpoint: "GET: /api/accounts/{address}",
         parameters: {

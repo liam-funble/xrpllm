@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-import {PromptTemplate} from './prompt/prompt-template'; // 새 파일 임포트
+import {PromptTemplate} from './prompt/prompt-template';
+import { TASKS } from './prompt/tasks';
 
 dotenv.config();
 
@@ -57,38 +58,53 @@ export class LLMService {
 
   private parseJsonFromLLMResponse(response: string): any {
     try {
-      const jsonString = response.replace(/```json\n?/, '').replace(/\n?```/, '');
-      const parsed = JSON.parse(jsonString);
-  
-      // 응답 형식 검증
-      if (!parsed.statusInfo || !parsed.data) {
-        throw new Error('Invalid response format');
-      }
-      if (!['success', 'partial', 'fail'].includes(parsed.statusInfo.status)) {
-        throw new Error('Invalid status value');
-      }
-      // if (parsed.data.task && !TASKS.some(t => t.name === parsed.data.task)) {
-      //   throw new Error('Invalid task name');
-      // }
-  
-      return parsed;
-    } catch (error) {
-      console.error('Error parsing JSON from LLM response:', error);
-      return {
-        statusInfo: {
-          status: 'fail',
-          description: 'LLM 응답 형식이 잘못됨'
-        },
-        data: null
-      };
-    }
-  }
+        const jsonString = response.replace(/```json\n?/, '').replace(/\n?```/, '');
+        const parsed = JSON.parse(jsonString);
 
-  async generateResponse(prompt: string, userId: string, model: string = 'gemma3:27b'): Promise<LLMResponse> {
+        // 응답 형식 검증
+        if (!parsed.statusInfo || !('data' in parsed)) {
+            throw new Error('Invalid response format: statusInfo or data missing');
+        }
+
+        // status 값 검증
+        const validStatuses = ['Actionable', 'NeedsMoreInfo', 'Informational', 'Failed'];
+        if (!validStatuses.includes(parsed.statusInfo.status)) {
+            throw new Error(`Invalid status value: ${parsed.statusInfo.status}`);
+        }
+
+        // task 값 검증 (task가 있을 경우 TASKS에 정의된 이름이어야 함)
+        if (parsed.data?.task && !TASKS.some(t => t.name === parsed.data.task)) {
+            throw new Error(`Invalid task name: ${parsed.data.task}`);
+        }
+
+        // message가 문자열인지 확인
+        if (typeof parsed.statusInfo.message !== 'string') {
+            throw new Error('Message must be a string');
+        }
+
+        // parameters가 객체 또는 null인지 확인
+        if (parsed.data?.parameters && typeof parsed.data.parameters !== 'object') {
+            throw new Error('Parameters must be an object or null');
+        }
+
+        return parsed;
+    } catch (error) {
+        console.error('Error parsing JSON from LLM response:', error);
+        return {
+            statusInfo: {
+                status: 'Failed',
+                message: '응답 형식이 잘못되었어요. 다시 시도해 주세요.'
+            },
+            data: null
+        };
+    }
+}
+
+  async generateResponse(prompt: string, userId: string, accounts:string, model: string = 'gemma3:27b'): Promise<LLMResponse> {
     try {
       console.log('LLMService.generateResponse - Original prompt:', prompt);
       
-      const formattedPrompt = PromptTemplate.generatePrompt(prompt, userId); // 템플릿 사용
+      const formattedPrompt = PromptTemplate.generatePrompt(prompt, userId, accounts);
       console.log('LLMService.generateResponse - Formatted prompt:', formattedPrompt);
 
       const requestBody = this.formatRequestBody(formattedPrompt, model, false);
