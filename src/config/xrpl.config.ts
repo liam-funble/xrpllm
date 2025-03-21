@@ -1,7 +1,10 @@
 import { Client } from 'xrpl'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export const xrplConfig = {
-  server: 'wss://s.altnet.rippletest.net:51233', // testnet
+  server: process.env.XRPL_SERVER || 'wss://s.altnet.rippletest.net:51233', // default to testnet if not specified
   // server: 'wss://xrplcluster.com', // mainnet
 }
 

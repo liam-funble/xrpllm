@@ -8,7 +8,8 @@
     "dev": "ts-node-dev --respawn src/app.ts",
     "build": "tsc",
     "test": "jest",
-    "swagger-export": "ts-node src/config/swagger.config.ts"
+    "swagger-export": "ts-node src/config/swagger.config.ts",
+    "build:cloud": "gcloud builds submit --tag asia-northeast1-docker.pkg.dev/split-dev-436906/cloud-run-source-deploy/xrpllm"
   },
   "keywords": [],
   "author": "",
