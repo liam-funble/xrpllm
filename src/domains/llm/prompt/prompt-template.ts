@@ -18,20 +18,28 @@ export class PromptTemplate {
 ### 작업 정보:
 ${taskInfo}
 
-### 계좌 매핑:
-- "사용자 정보" 형식: "user_name:user_address" (예: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4")
-- "accounts" 형식: "account_name:account_address" (예: "alice:rAliceAccountAddress, bob:rBobAccountAddress, cat:rCatAccountAddress")
-- "from"/"to" 이름은 반드시 계좌 주소록("accounts")에 정확히 일치하는 이름만 주소로 매핑할 것
-- "from" 미지정 시 "my"에서 주소 부분만 추출 (예: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4" → "rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"), "my"가 없으면 userId
-- 주소록에 정확히 일치하는 이름이 없으면 "toAddress"를 null로 설정하고, "status"를 "fail"로 변경, "message"에 "[이름]이 주소록에 없어요. 계좌를 등록하거나 주소를 알려주세요" 추가
-- "fromAddress"와 "toAddress"는 반드시 주소만 포함하며, 이름은 제외 (예: "rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4", "rAliceAccountAddress")
+### 주소 처리 규칙:
+1. 주소 형식
+   - "사용자 정보": "user_name:user_address" (예: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4")
+   - "주소록": "account_name:account_address" (예: "alice:rAliceAccountAddress")
 
-### 명확한 이름 매칭 규칙:
-- 주소록의 이름(alice, bob, cat 등)과 사용자 요청의 이름이 정확히 일치해야만 매핑함
-- "친구", "동생", "누구" 등 일반적인 호칭은, 설령 주소록 이름과 유사하더라도 매핑하지 말 것
-- 주소록에 없는 이름은 항상 status "fail"로 처리하고, 절대 임의로 주소를 지정하지 말 것
+2. 주소 매핑
+   - fromAddress: "my"의 주소 부분 추출 또는 userId
+   - toAddress: 주소록의 정확히 일치하는 이름만 매핑
+   - 모든 주소는 이름 제외, 주소만 포함 (예: "rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4")
 
-### 응답 형식:
+3. 이름 매칭 (엄격한 규칙)
+   - 주소록의 nickname과 100% 동일한 경우에만 매핑 (대소문자 구분)
+   - 유사한 이름이나 부분 일치는 절대 허용하지 않음 (예: "케이" ≠ "카이", "준호" ≠ "준")
+   - 다음과 같은 경우 모두 fail 처리:
+     * 유사한 발음의 이름 ("케이" vs "카이")
+     * 부분 일치하는 이름 ("준" vs "준호")
+     * 일반 호칭 ("친구", "동생" 등)
+     * 주소록에 없는 이름
+   - fail 시 메시지: "[입력된 이름]이 주소록에 없어요. 정확한 이름으로 다시 시도해주세요."
+
+### 응답 규칙:
+1. 응답 형식
 {
   "statusInfo": {
     "status": "success" | "fail",
@@ -43,56 +51,44 @@ ${taskInfo}
   }
 }
 
-### 상태:
-- success: 모든 필수 파라미터("fromAddress", "toAddress", "amount")가 정확히 준비됨
-- fail: 파라미터 부족("toAddress"가 null 포함) 또는 정보 제공 요청이나 지원 불가 상황
+2. 상태 처리
+   - success: 모든 필수 파라미터가 유효한 경우
+   - fail: 파라미터 누락/무효 또는 정보 제공/지원 불가
 
-### 규칙:
-- "task"/"endpoint"는 TASKS와 일치
-- "parameters"는 TASKS 구조 사용, 누락 시 null
-- "amount"는 숫자 문자열, 단위 없거나 "원"이면 XRP로 간주
-- 필수 파라미터("fromAddress", "toAddress", "amount") 중 하나라도 null이면 "status"는 반드시 "fail"
-- "fromAddress" 기본값: "my"의 주소 부분만 추출 (예: "rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4") or userId
-- 주소록에 없는 이름을 요청 시, "message"에 반드시 "[이름]이 주소록에 없어요" 포함
-- 이름이 주소록에 정확히 일치하지 않으면 항상 "fail" 처리할 것
-- "fromAddress"와 "toAddress"는 항상 주소만 포함하며, "이름:주소" 형식이 아닌 주소 단독으로 반환
+3. 파라미터 처리
+   - task는 TASKS와 정확히 일치
+   - amount는 숫자 문자열 (단위 없음/원/리플플 → XRP)
+   - fromAddress/toAddress/amount 중 하나라도 null이면 fail
+   - 주소록에 없는 이름 요청 시 "[이름]이 주소록에 없어요" 메시지 포함
 
 ### 예시:
-1. 
-- prompt: "bob에게 10 XRP를 보내"
+1. 정상 송금
+- prompt: "카이에게 10 XRP를 보내"
 - my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
-- accounts: "alice:rAliceAccountAddress, bob:rBobAccountAddress"
-- 응답: {"statusInfo":{"status":"success","message":"bob에게 10 XRP를 보내는 작업을 준비했어요. 인증 해주시면 바로 보낼게요!"},"data":{"task":"payment-xrp","parameters":{"fromAddress":"rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4","toAddress":"rBobAccountAddress","amount":"10"}}}
+- accounts: "카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"success","message":"카이에게 10 XRP를 보내는 작업을 준비했어요. 인증 해주시면 바로 보낼게요!"},"data":{"task":"payment-xrp","parameters":{"fromAddress":"rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4","toAddress":"rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv","amount":"10"}}}
 
-2. 
-- prompt: "찬호에게 1000원 보내줘"
+2. 유사 이름 실패
+- prompt: "케이에게 100원 보내줘"
 - my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
-- accounts: "alice:rAliceAccountAddress, bob:rBobAccountAddress"
-- 응답: {"statusInfo":{"status":"fail","message":"찬호에게 1000 XRP를 보내고 싶으시군요! 찬호가 주소록에 없어요. 계좌를 등록하거나 주소를 알려주세요."},"data":{"task":"payment-xrp","parameters":{"fromAddress":"rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4","toAddress":null,"amount":"1000"}}}
+- accounts: "카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"fail","message":"케이에게 100 XRP를 보내고 싶으시군요! 케이가 주소록에 없어요. 정확한 이름으로 다시 시도해주세요."},"data":{"task":"payment-xrp","parameters":{"fromAddress":"rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4","toAddress":null,"amount":"100"}}}
 
-3. 
+3. 기능 문의
 - prompt: "어떤 기능을 사용할 수 있어?"
-- my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
-- accounts: "alice:rAliceAccountAddress"
 - 응답: {"statusInfo":{"status":"fail","message":"계좌 조회, 거래 내역 조회, 거래 상세 조회, XRP 송금이 가능해요. 어떤 도움을 드릴까요?"},"data":{"task":null,"parameters":null}}
 
-4. 
-- prompt: "100 BTC 보내줘"
+4. 지원되지 않는 기능 요청
+- prompt: "비트코인 100개 보내줘"
 - my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
-- accounts: "bob:rBobAccountAddress"
-- 응답: {"statusInfo":{"status":"fail","message":"죄송해요, XRPL 기능만 지원해요. XRP 송금이나 계좌 조회를 도와드릴까요"},"data":{"task":null,"parameters":null}}
+- accounts: "카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"fail","message":"죄송해요, XRPL 기능만 지원해요. XRP 송금이나 계좌 조회를 도와드릴까요?"},"data":{"task":null,"parameters":null}}
 
-5. 
-- prompt: "cat에게 10 XRP 보내줘"
+5. 지원되지 않는 작업 요청
+- prompt: "카이의 계좌를 삭제해줘"
 - my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
-- accounts: "alice:rAliceAccountAddress, bob:rBobAccountAddress, cat:rCatAccountAddress"
-- 응답: {"statusInfo":{"status":"success","message":"cat에게 10 XRP를 보내는 작업을 준비했어요. 인증 해주시면 바로 보낼게요!"},"data":{"task":"payment-xrp","parameters":{"fromAddress":"rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4","toAddress":"rCatAccountAddress","amount":"10"}}}
-
-6. 
-- prompt: "친구에게 10 XRP 보내줘"
-- my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
-- accounts: "alice:rAliceAccountAddress, bob:rBobAccountAddress"
-- 응답: {"statusInfo":{"status":"fail","message":"친구에게 10 XRP를 보내고 싶으시군요! 친구가 주소록에 없어요. 계좌를 등록하거나 주소를 알려주세요."},"data":{"task":"payment-xrp","parameters":{"fromAddress":"rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4","toAddress":null,"amount":"10"}}}
+- accounts: "카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"fail","message":"죄송해요, 계좌 삭제는 지원하지 않는 기능이에요. 계좌 조회나 XRP 송금을 도와드릴까요?"},"data":{"task":null,"parameters":null}}
 `;
   }
 }
