@@ -2,6 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import {PromptTemplate} from './prompt/prompt-template';
 import { TASKS } from './prompt/tasks';
+import {Friend, GenerateResponseParams, MyInfo} from "./accounts";
 
 dotenv.config();
 
@@ -67,7 +68,7 @@ export class LLMService {
         }
 
         // status 값 검증
-        const validStatuses = ['Actionable', 'NeedsMoreInfo', 'Informational', 'Failed'];
+        const validStatuses = ['success', 'fail'];
         if (!validStatuses.includes(parsed.statusInfo.status)) {
             throw new Error(`Invalid status value: ${parsed.statusInfo.status}`);
         }
@@ -100,11 +101,24 @@ export class LLMService {
     }
 }
 
-  async generateResponse(prompt: string, userId: string, accounts:string, model: string = 'gemma3:27b'): Promise<LLMResponse> {
+  async generateResponse(
+    prompt: string, 
+    model: string = 'gemma3:27b', 
+    friends: Friend[] = [], 
+    my: MyInfo = { nickname: '', address: '' }
+  ): Promise<LLMResponse> {
     try {
       console.log('LLMService.generateResponse - Original prompt:', prompt);
       
-      const formattedPrompt = PromptTemplate.generatePrompt(prompt, userId, accounts);
+      // friends 배열을 문자열로 변환
+      const friendsString = friends
+        .map(friend => `${friend.nickname}:${friend.address}`)
+        .join(', ');
+      
+      // my 정보를 문자열로 변환
+      const myString = `${my.nickname}:${my.address}`;
+      
+      const formattedPrompt = PromptTemplate.generatePrompt(prompt, friendsString, myString);
       console.log('LLMService.generateResponse - Formatted prompt:', formattedPrompt);
 
       const requestBody = this.formatRequestBody(formattedPrompt, model, false);
