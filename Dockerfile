@@ -33,6 +33,7 @@ COPY --from=builder /app/dist ./dist
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV XRPL_SERVER=wss://s.altnet.rippletest.net:51233
+ENV CORS_ORIGINS=https://web-nft-front-128y2k2llvpe2qao.sel5.cloudtype.app
 
 # Expose port
 EXPOSE 3000

@@ -55,6 +55,13 @@ LLM_API_URL=http://localhost:11434/api/generate
 
 # XRPL 설정
 XRPL_SERVER=wss://s.altnet.rippletest.net:51233
+
+# CORS 설정
+# 개발 환경
+CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+
+# 프로덕션 환경
+# CORS_ORIGINS=https://web-nft-front-128y2k2llvpe2qao.sel5.cloudtype.app
 ```
 
 ### 실행
@@ -74,12 +81,22 @@ npm start
 # 도커 이미지 빌드
 docker build -t xrpllm-service .
 
-# 도커 컨테이너 실행
+# 도커 컨테이너 실행 (개발 환경)
 docker run -d \
   -p 3000:3000 \
   -e LLM_PROVIDER=ollama \
   -e LLM_API_URL=http://host.docker.internal:11434/api/generate \
   -e XRPL_SERVER=wss://s.altnet.rippletest.net:51233 \
+  -e CORS_ORIGINS=http://localhost:3000,http://localhost:5173 \
+  xrpllm-service
+
+# 도커 컨테이너 실행 (프로덕션 환경)
+docker run -d \
+  -p 3000:3000 \
+  -e LLM_PROVIDER=ollama \
+  -e LLM_API_URL=http://host.docker.internal:11434/api/generate \
+  -e XRPL_SERVER=wss://s.altnet.rippletest.net:51233 \
+  -e CORS_ORIGINS=https://web-nft-front-128y2k2llvpe2qao.sel5.cloudtype.app \
   xrpllm-service
 ```
 

@@ -1,12 +1,15 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
+import cors from 'cors'
 import { specs, exportSwaggerDocs } from './config/swagger.config'
 import accountRoutes from './domains/account/accountRoutes'
 import transactionRoutes from './domains/transaction/transactionRoutes'
 import llmRoutes from './domains/llm/llmRoutes'
 import nftRoutes from './domains/nft/nftRoutes'
+import corsOptions from './config/cors.config'
 
 const app = express()
+app.use(cors(corsOptions))
 app.use(express.json())
 
 // Swagger UI
