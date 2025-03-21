@@ -4,13 +4,13 @@ export interface Friend {
 }
 
 export interface MyInfo {
-    nickname: string;
     address: string;
+    userId: string;
 }
 
 export interface GenerateResponseParams {
     prompt: string;
     model?: string;
-    friends?: Friend[];
     my?: MyInfo;
+    friends?: Friend[];
 }

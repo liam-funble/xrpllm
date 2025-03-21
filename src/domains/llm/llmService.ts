@@ -105,7 +105,7 @@ export class LLMService {
     prompt: string, 
     model: string = 'gemma3:27b', 
     friends: Friend[] = [], 
-    my: MyInfo = { nickname: '', address: '' }
+    my: MyInfo = { userId: '', address: '' }
   ): Promise<LLMResponse> {
     try {
       console.log('LLMService.generateResponse - Original prompt:', prompt);
@@ -116,7 +116,7 @@ export class LLMService {
         .join(', ');
       
       // my 정보를 문자열로 변환
-      const myString = `${my.nickname}:${my.address}`;
+      const myString = `${my.userId}:${my.address}`;
       
       const formattedPrompt = PromptTemplate.generatePrompt(prompt, friendsString, myString);
       console.log('LLMService.generateResponse - Formatted prompt:', formattedPrompt);

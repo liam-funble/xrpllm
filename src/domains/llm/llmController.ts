@@ -11,7 +11,7 @@ export class LLMController {
 
   async generateResponse(req: Request, res: Response) {
     try {
-      const { prompt, model, friends, my } = req.body as GenerateResponseParams;
+      const { prompt, model, my, friends } = req.body as GenerateResponseParams;
       console.log('LLMController.generateResponse - Request body:', req.body);
 
       if (!prompt) {

@@ -31,4 +31,14 @@ export const TASKS: TaskDefinition[] = [
         },
         description: "특정 거래의 상세 정보를 조회합니다.",
     },
+    {
+        name: "go-to-main",
+        parameters: null,
+        description: "메인으로 이동합니다."
+    },
+    {
+        name: "error",
+        parameters: null,
+        description: "미지원 기능입니다."
+    }
 ];
