@@ -7,6 +7,8 @@ import transactionRoutes from './domains/transaction/transactionRoutes'
 import llmRoutes from './domains/llm/llmRoutes'
 import nftRoutes from './domains/nft/nftRoutes'
 import corsOptions from './config/cors.config'
+import ftRoutes from './domains/ft/ftRoutes'
+import { Client } from 'xrpl'
 
 const app = express()
 app.use(cors(corsOptions))
@@ -21,11 +23,15 @@ if (process.env.NODE_ENV === 'development') {
   console.log('Swagger documentation exported to swagger.json')
 }
 
+// XRPL 클라이언트 초기화 (이미 있다고 가정)
+const client = new Client('wss://s.altnet.rippletest.net:51233') // 테스트넷 URL
+
 // Routes
 app.use('/api/accounts', accountRoutes)
 app.use('/api/transactions', transactionRoutes)
 app.use('/api/llm', llmRoutes)
 app.use('/api/nft', nftRoutes)
+app.use('/api/ft', ftRoutes(client))
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
