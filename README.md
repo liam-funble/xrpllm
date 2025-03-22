@@ -12,6 +12,12 @@
   - XRP 송금
   - 트랜잭션 내역 조회
   - 트랜잭션 상세 정보 조회
+- 친구 관리
+  - 친구 목록 조회
+  - 친구 상세 정보 보기
+- 토큰 거래(DEX)
+  - Offer 제출
+  - 토큰 구매/판매
 
 ### LLM 기능
 - 텍스트 생성
@@ -19,6 +25,7 @@
   - 컨텍스트 기반 응답
     - 사용자 정보 (닉네임, 주소) 기반
     - 친구 목록 정보 기반
+    - 보유 토큰 정보 기반
 - 응답 형식
   - JSON 구조화된 응답
   - 상태 정보 포함
@@ -115,6 +122,14 @@ docker run -d \
 - `GET /api/transactions/history/:address` - 거래 내역 조회
 - `GET /api/transactions/:hash` - 거래 상세 정보 조회
 
+#### 친구 관리
+- `GET /api/friends` - 친구 목록 조회
+- `GET /api/friends/:name` - 친구 상세 정보 조회
+
+#### 토큰 거래
+- `POST /api/offers/create` - Offer 제출
+- `GET /api/tokens` - 보유 토큰 조회
+
 ### LLM 관련
 - `POST /api/llm/generate` - 텍스트 생성
   ```json
@@ -130,51 +145,17 @@ docker run -d \
     "my": {
       "nickname": "Bob",
       "address": "rBobXRPAddress..."
-    }
+    },
+    "fts": [
+      {
+        "currency": "ABC",
+        "issuer": "rIssuerAddress...",
+        "balance": "100"
+      }
+    ]
   }
   ```
 
 ## API 문서
 API 문서는 Swagger UI를 통해 제공됩니다.
 ```
-http://localhost:3000/api-docs
-```
-
-## 응답 형식
-
-### LLM 응답 구조
-```json
-{
-  "statusInfo": {
-    "status": "success" | "fail",
-    "message": "응답 메시지"
-  },
-  "data": {
-    "task": "task_name",
-    "parameters": {
-      // 작업별 파라미터
-    }
-  }
-}
-```
-
-## 기술 스택
-- TypeScript
-- Express.js
-- XRPL.js
-- Axios
-- Ollama/LLM Integration
-- Swagger UI
-- Docker
-
-## 보안 고려사항
-- 프로덕션 환경에서는 반드시 HTTPS를 사용하세요.
-- API 키와 비밀키는 안전하게 관리해야 합니다.
-- 계정 시크릿 키는 클라이언트 측에서 관리되어야 합니다.
-- 사용자 정보와 친구 목록은 암호화하여 전송해야 합니다.
-
-## 라이선스
-이 프로젝트는 MIT 라이선스에 따라 배포됩니다. 이 소프트웨어를 자유롭게 사용, 복사, 수정, 병합, 배포, 2차 라이선스 부여, 판매할 수 있으며, 단 소프트웨어의 모든 복사본 또는 상당 부분에 저작권 표시와 허가 문구를 포함해야 합니다. 자세한 내용은 [LICENSE](LICENSE.md) 파일을 참고하세요.
-
-## 문의
-박찬호 chpark6737@gmail.com
