@@ -2,7 +2,7 @@
 import {TASKS} from "./tasks";
 
 export class PromptTemplate {
-  static generatePrompt(prompt: string, accounts: string, my: string): string {
+  static generatePrompt(prompt: string, friends: string, my: string, fts: string = ''): string {
     const taskNames = TASKS.map(t => `"${t.name}"`).join(" | ");
     const taskInfo = TASKS.map(t => 
       `- ${t.name}: 파라미터: ${t.parameters ? Object.entries(t.parameters).map(([k, v]) => `${k}: ${v}`).join(", ") : "없음"} | ${t.description}`
@@ -11,9 +11,15 @@ export class PromptTemplate {
     return `
 당신은 XRPL 작업을 돕는 어시스턴트입니다. 요청을 분석해 작업을 수행하거나 응답을 제공하세요.
 
-사용자 요청: "${prompt}"
-사용자 정보: "${my}"
-주소록: "${accounts}"
+<context>
+      내 정보: ${my || '정보 없음'}
+      친구 목록: ${friends || '친구 없음'}
+      보유 토큰: ${fts || '토큰 없음'}
+</context>
+            
+<user>
+      사용자 요청: ${prompt}
+</user>
 
 ### 작업 정보:
 ${taskInfo}

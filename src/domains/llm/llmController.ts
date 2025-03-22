@@ -11,7 +11,7 @@ export class LLMController {
 
   async generateResponse(req: Request, res: Response) {
     try {
-      const { prompt, model, my, friends } = req.body as GenerateResponseParams;
+      const { prompt, model, my, friends, FTs } = req.body as GenerateResponseParams;
       console.log('LLMController.generateResponse - Request body:', req.body);
 
       if (!prompt) {
@@ -23,7 +23,13 @@ export class LLMController {
       }
 
       console.log('LLMController.generateResponse - Calling LLM service');
-      const result = await this.llmService.generateResponse(prompt, model, friends, my);
+      const result = await this.llmService.generateResponse({
+        prompt,
+        model,
+        friends,
+        my,
+        FTs
+      });
       console.log('LLMController.generateResponse - LLM service response:', result);
 
       res.json(result);

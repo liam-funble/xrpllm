@@ -8,9 +8,16 @@ export interface MyInfo {
     userId: string;
 }
 
+export interface FT {
+    currency: string;
+    issuerAddress: string;
+    balance: string;
+}
+
 export interface GenerateResponseParams {
     prompt: string;
     model?: string;
     my?: MyInfo;
     friends?: Friend[];
+    FTs: FT[];
 }

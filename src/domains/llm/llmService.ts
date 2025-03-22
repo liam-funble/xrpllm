@@ -101,12 +101,13 @@ export class LLMService {
     }
 }
 
-  async generateResponse(
-    prompt: string, 
-    model: string = 'gemma3:27b', 
-    friends: Friend[] = [], 
-    my: MyInfo = { userId: '', address: '' }
-  ): Promise<LLMResponse> {
+  async generateResponse({
+    prompt, 
+    model = 'gemma3:27b', 
+    friends = [], 
+    my = { userId: '', address: '' },
+    FTs = []
+  }: GenerateResponseParams): Promise<LLMResponse> {
     try {
       console.log('LLMService.generateResponse - Original prompt:', prompt);
       
@@ -118,7 +119,13 @@ export class LLMService {
       // my 정보를 문자열로 변환
       const myString = `${my.userId}:${my.address}`;
       
-      const formattedPrompt = PromptTemplate.generatePrompt(prompt, friendsString, myString);
+      // FTs 배열을 문자열로 변환
+      const ftsString = FTs
+        .map(ft => `${ft.currency}:${ft.issuerAddress}:${ft.balance}`)
+        .join(', ');
+      
+      // PromptTemplate.generatePrompt 메서드가 FTs를 처리할 수 있도록 수정 필요
+      const formattedPrompt = PromptTemplate.generatePrompt(prompt, friendsString, myString, ftsString);
       console.log('LLMService.generateResponse - Formatted prompt:', formattedPrompt);
 
       const requestBody = this.formatRequestBody(formattedPrompt, model, false);

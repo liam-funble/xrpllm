@@ -1,3 +1,4 @@
+import { isCurrency } from "xrpl/dist/npm/models/transactions/common";
 import {TaskDefinition} from "./task-definition";
 
 export const TASKS: TaskDefinition[] = [
@@ -35,6 +36,29 @@ export const TASKS: TaskDefinition[] = [
         name: "go-to-main",
         parameters: null,
         description: "메인으로 이동합니다."
+    },
+    {
+        name: "go-to-friends",
+        parameters: null,
+        description: "친구목록으로 이동합니다."
+    },
+    {
+        name: "go-to-friend-detail",
+        parameters: {
+            address: "string"
+        },
+        description: "친구 상세 정보로 이동합니다."
+    },
+    {
+        name: "create-offer",
+        parameters: {
+            currency: "string",
+            issuerAccount: "string",
+            ammount: "string",
+            xrpAmount: "string",
+
+        },
+        description: "DEX에 Offer를 제출합니다."
     },
     {
         name: "error",

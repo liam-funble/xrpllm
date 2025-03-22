@@ -242,14 +242,31 @@ export class DEXService {
           if (meta.AffectedNodes) {
             for (const node of meta.AffectedNodes) {
               if (node.CreatedNode && node.CreatedNode.LedgerEntryType === 'Offer') {
-                offerSequence = node.CreatedNode.LedgerIndex.split(':')[2];
-                console.log(`[DEXService] 생성된 오퍼 시퀀스: ${offerSequence}`);
-                break;
+                // 방법 1: NewFields.Sequence에서 시퀀스 가져오기
+                if (node.CreatedNode.NewFields && node.CreatedNode.NewFields.Sequence) {
+                  offerSequence = node.CreatedNode.NewFields.Sequence;
+                  console.log(`[DEXService] 생성된 오퍼 시퀀스: ${offerSequence}`);
+                  break;
+                }
+                
+                // 방법 2: LedgerIndex에서 추출 시도 (기존 방식 백업)
+                else if (node.CreatedNode.LedgerIndex && node.CreatedNode.LedgerIndex.includes(':')) {
+                  offerSequence = node.CreatedNode.LedgerIndex.split(':')[2];
+                  console.log(`[DEXService] 생성된 오퍼 시퀀스(LedgerIndex에서): ${offerSequence}`);
+                  break;
+                }
               }
             }
           }
+          
+          // 위 방법으로 못 찾았을 경우, 트랜잭션 자체의 Sequence 사용
+          if (!offerSequence && result.result.Sequence) {
+            offerSequence = result.result.Sequence;
+            console.log(`[DEXService] 오퍼 시퀀스(트랜잭션 Sequence 사용): ${offerSequence}`);
+          }
         } catch (e) {
           console.warn('[DEXService] 오퍼 시퀀스 추출 실패:', e);
+          console.warn('[DEXService] 오류 세부정보:', e instanceof Error ? e.message : String(e));
         }
         
         return {
