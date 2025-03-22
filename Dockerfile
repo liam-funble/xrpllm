@@ -32,7 +32,7 @@ COPY --from=builder /app/dist ./dist
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV XRPL_SERVER=wss://s.altnet.rippletest.net:51233
+ENV XRPL_SERVER=wss://xrp-testnet.g.allthatnode.com/full/json_rpc/7624ecf3aa4f4ddb818079fec1cc4104
 ENV CORS_ORIGINS=https://web-nft-front-128y2k2llvpe2qao.sel5.cloudtype.app
 
 # Expose port

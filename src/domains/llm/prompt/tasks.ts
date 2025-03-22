@@ -45,6 +45,7 @@ export const TASKS: TaskDefinition[] = [
     {
         name: "go-to-friend-detail",
         parameters: {
+            friendName: "string",
             address: "string"
         },
         description: "친구 상세 정보로 이동합니다."
@@ -53,7 +54,7 @@ export const TASKS: TaskDefinition[] = [
         name: "create-offer",
         parameters: {
             currency: "string",
-            issuerAccount: "string",
+            issuerName: "string",
             ammount: "string",
             xrpAmount: "string",
 

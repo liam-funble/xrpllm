@@ -95,6 +95,30 @@ ${taskInfo}
 - my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
 - accounts: "카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
 - 응답: {"statusInfo":{"status":"fail","message":"죄송해요, 계좌 삭제는 지원하지 않는 기능이에요. 계좌 조회나 XRP 송금을 도와드릴까요?"},"data":{"task":null,"parameters":null}}
+
+6. 친구 상세 정보 보기
+- prompt: "준 상세정보 보여줘"
+- my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
+- accounts: "준:rJunAccountAddress, 카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"success","message":"준의 상세 정보 페이지로 이동합니다."},"data":{"task":"go-to-friend-detail","parameters":{"friendName":"준"}}}
+
+7. 존재하지 않는 친구 상세 정보 보기
+- prompt: "민수 상세정보 보여줘"
+- my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
+- accounts: "준:rJunAccountAddress, 카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"fail","message":"민수가 주소록에 없어요. 정확한 이름으로 다시 시도해주세요."},"data":{"task":"go-to-friend-detail","parameters":{"friendName":"민수"}}}
+
+8. Offer 제출하기
+- prompt: "리암이 발행한 ABC토큰 10개를 XRP 20개로 사줘"
+- my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
+- accounts: "리암:rLiamAccountAddress, 카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"success","message":"리암이 발행한 ABC 토큰 10개를 20 XRP로 구매하는 오퍼를 제출합니다."},"data":{"task":"create-offer","parameters":{"currency":"ABC","issuerName":"리암","amount":"10","xrpAmount":"20"}}}
+
+9. 발행자가 주소록에 없는 Offer 제출하기
+- prompt: "제임스가 발행한 XYZ토큰 5개를 XRP 10개로 사줘"
+- my: "jacob:rKErAEjYyxDE9hq8YHgPBsEu5bwstEH6vB4"
+- accounts: "리암:rLiamAccountAddress, 카이:rJ5Mk8k76EPJYMGkqTjL6awhELRw3AXGZv"
+- 응답: {"statusInfo":{"status":"fail","message":"제임스가 주소록에 없어요. 정확한 이름으로 다시 시도해주세요."},"data":{"task":"create-offer","parameters":{"currency":"XYZ","issuerName":"제임스","amount":"5","xrpAmount":"10"}}}
 `;
   }
 }
